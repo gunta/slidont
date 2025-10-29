@@ -9,7 +9,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Plus, CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 
 import { useMutation, useQuery } from "convex/react";
@@ -48,7 +48,10 @@ function TodosRoute() {
 		<div className="mx-auto w-full max-w-md py-10">
 			<Card>
 				<CardHeader>
-					<CardTitle>Todo List</CardTitle>
+					<CardTitle className="flex items-center gap-2">
+						<CheckCircle2 className="h-5 w-5" />
+						Todo List
+					</CardTitle>
 					<CardDescription>Manage your tasks efficiently</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -61,7 +64,8 @@ function TodosRoute() {
 							onChange={(e) => setNewTodoText(e.target.value)}
 							placeholder="Add a new task..."
 						/>
-						<Button type="submit" disabled={!newTodoText.trim()}>
+						<Button type="submit" disabled={!newTodoText.trim()} className="gap-2">
+							<Plus className="h-4 w-4" />
 							Add
 						</Button>
 					</form>
@@ -71,7 +75,10 @@ function TodosRoute() {
 							<Loader2 className="h-6 w-6 animate-spin" />
 						</div>
 					) : todos.length === 0 ? (
-						<p className="py-4 text-center">No todos yet. Add one above!</p>
+						<div className="py-4 text-center flex flex-col items-center gap-2">
+							<Circle className="h-12 w-12 text-muted-foreground opacity-50" />
+							<p>No todos yet. Add one above!</p>
+						</div>
 					) : (
 						<ul className="space-y-2">
 							{todos.map((todo) => (

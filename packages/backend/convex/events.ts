@@ -18,11 +18,14 @@ export const ensureSeed = mutation({
 			.withIndex("by_slug", (q) => q.eq("slug", "cursor-tokyo-meetup-ryo-qa"))
 			.first();
 
+		const presenterSecret = "12345"; // Hardcoded for now
+
 		if (existing) {
-			return existing;
+			// Update the existing event's secret
+			await ctx.db.patch(existing._id, { presenterSecret });
+			return await ctx.db.get(existing._id);
 		}
 
-		const presenterSecret = Math.random().toString(36).substring(2, 15);
 		const eventId = await ctx.db.insert("events", {
 			slug: "cursor-tokyo-meetup-ryo-qa",
 			title: "Cursor Tokyo Meetup - Ryo's Q&A",

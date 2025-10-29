@@ -6,6 +6,9 @@ import { QuestionComposer } from "@/components/qa/question-composer";
 import { QuestionList } from "@/components/qa/question-list";
 // import { PresenceBar } from "@/components/qa/presence-bar";
 import { useEffect } from "react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { SlidontLogo } from "@/components/slidont-logo";
+import { useLanguage } from "@/components/language-provider";
 
 export const Route = createFileRoute("/q/$eventSlug")({
 	component: QAPage,
@@ -16,6 +19,7 @@ function QAPage() {
 	const { displayName, authorColor, sessionId, rememberName } = useLocalIdentity();
 	const ensureSeed = useMutation(api.events.ensureSeed);
 	const event = useQuery(api.events.getBySlug, { slug: eventSlug });
+	const { t } = useLanguage();
 
 	useEffect(() => {
 		ensureSeed();
@@ -25,8 +29,9 @@ function QAPage() {
 		return (
 			<div className="container mx-auto max-w-3xl px-4 py-8">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Loading...</h1>
-					<p className="text-muted-foreground">Setting up your Q&A session...</p>
+					<Loader2 className="h-12 w-12 mx-auto mb-4 animate-spin text-blue-600" />
+					<h1 className="text-2xl font-bold mb-4">{t("loading")}</h1>
+					<p className="text-muted-foreground">{t("settingUpSession")}</p>
 				</div>
 			</div>
 		);
@@ -36,8 +41,9 @@ function QAPage() {
 		return (
 			<div className="container mx-auto max-w-3xl px-4 py-8">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Event not found</h1>
-					<p className="text-muted-foreground">The event you're looking for doesn't exist.</p>
+					<AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
+					<h1 className="text-2xl font-bold mb-4">{t("eventNotFound")}</h1>
+					<p className="text-muted-foreground">{t("eventDoesNotExist")}</p>
 				</div>
 			</div>
 		);
@@ -47,8 +53,10 @@ function QAPage() {
 		<div className="container mx-auto max-w-3xl px-4 py-8">
 			<div className="space-y-6">
 				<div className="text-center">
-					<h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-					<p className="text-muted-foreground">Ask your questions below</p>
+					<div className="flex items-center justify-center gap-3 mb-2">
+						<SlidontLogo height={36} />
+						<h1 className="text-3xl font-bold">{event.title}</h1>
+					</div>
 				</div>
 
 				{/* <PresenceBar eventSlug={eventSlug} userName={displayName || "Anonymous"} /> */}

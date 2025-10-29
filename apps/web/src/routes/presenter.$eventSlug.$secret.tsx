@@ -2,9 +2,38 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@slidont/backend/convex/_generated/api";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { CheckCircle, Eye, EyeOff } from "lucide-react";
+import { CheckCircle, ThumbsUp, Flag, MessageSquare, Clock, Loader2, AlertCircle } from "lucide-react";
 import type { Id } from "@slidont/backend/convex/_generated/dataModel";
+import { getInitials } from "@/lib/identity";
+import { SlidontLogo } from "@/components/slidont-logo";
+import { useLanguage } from "@/components/language-provider";
+
+const GRADIENT_PAIRS = [
+	{ from: "#ef4444", to: "#f97316" },
+	{ from: "#f97316", to: "#eab308" },
+	{ from: "#eab308", to: "#84cc16" },
+	{ from: "#84cc16", to: "#22c55e" },
+	{ from: "#22c55e", to: "#10b981" },
+	{ from: "#10b981", to: "#14b8a6" },
+	{ from: "#14b8a6", to: "#06b6d4" },
+	{ from: "#06b6d4", to: "#0ea5e9" },
+	{ from: "#0ea5e9", to: "#3b82f6" },
+	{ from: "#3b82f6", to: "#6366f1" },
+	{ from: "#6366f1", to: "#8b5cf6" },
+	{ from: "#8b5cf6", to: "#a855f7" },
+	{ from: "#a855f7", to: "#d946ef" },
+	{ from: "#d946ef", to: "#ec4899" },
+	{ from: "#ec4899", to: "#f43f5e" },
+	{ from: "#f43f5e", to: "#ef4444" },
+];
+
+function getGradientFromName(name: string): { from: string; to: string } {
+	let hash = 0;
+	for (let i = 0; i < name.length; i++) {
+		hash = name.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	return GRADIENT_PAIRS[Math.abs(hash) % GRADIENT_PAIRS.length];
+}
 
 export const Route = createFileRoute("/presenter/$eventSlug/$secret")({
 	component: PresenterPage,
@@ -15,12 +44,14 @@ function PresenterPage() {
 	const event = useQuery(api.events.getBySlug, { slug: eventSlug });
 	const questions = useQuery(api.questions.listAll, { eventSlug });
 	const markDone = useMutation(api.questions.markDone);
+	const { t, language } = useLanguage();
 
 	if (!event) {
 		return (
-			<div className="container mx-auto max-w-4xl px-4 py-8">
+			<div className="h-screen w-screen flex items-center justify-center bg-black">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Loading...</h1>
+					<Loader2 className="h-16 w-16 mx-auto mb-8 animate-spin text-white" />
+					<h1 className="text-8xl font-bold text-white mb-8">{t("loading")}</h1>
 				</div>
 			</div>
 		);
@@ -28,10 +59,11 @@ function PresenterPage() {
 
 	if (event.presenterSecret !== secret) {
 		return (
-			<div className="container mx-auto max-w-4xl px-4 py-8">
+			<div className="h-screen w-screen flex items-center justify-center bg-black">
 				<div className="text-center">
-					<h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
-					<p className="text-muted-foreground">You don't have access to this presenter view.</p>
+					<AlertCircle className="h-16 w-16 mx-auto mb-8 text-red-500" />
+					<h1 className="text-8xl font-bold text-white mb-8">{t("unauthorized")}</h1>
+					<p className="text-4xl text-gray-400">{t("noAccess")}</p>
 				</div>
 			</div>
 		);
@@ -47,79 +79,103 @@ function PresenterPage() {
 
 	const timeAgo = (timestamp: number) => {
 		const seconds = Math.floor((Date.now() - timestamp) / 1000);
-		if (seconds < 60) return "just now";
+		if (seconds < 60) return language === "ja" ? "たった今" : "just now";
 		const minutes = Math.floor(seconds / 60);
-		if (minutes < 60) return `${minutes}m ago`;
+		if (minutes < 60) return language === "ja" ? `${minutes}分前` : `${minutes}m ago`;
 		const hours = Math.floor(minutes / 60);
-		if (hours < 24) return `${hours}h ago`;
+		if (hours < 24) return language === "ja" ? `${hours}時間前` : `${hours}h ago`;
 		const days = Math.floor(hours / 24);
-		return `${days}d ago`;
+		return language === "ja" ? `${days}日前` : `${days}d ago`;
 	};
 
+	// Filter out marked done questions
+	const pendingQuestions = questions?.filter((q) => !q.hiddenByPresenter) || [];
+
 	return (
-		<div className="container mx-auto max-w-4xl px-4 py-8">
-			<div className="space-y-6">
-				<div className="text-center">
-					<h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-					<p className="text-muted-foreground">Presenter Dashboard</p>
+		<div className="h-screen w-screen bg-black overflow-y-auto">
+			<div className="min-h-screen px-16 py-12">
+				{/* Header */}
+				<div className="mb-16 text-center border-b border-gray-800 pb-8">
+					<div className="flex items-center justify-center gap-6 mb-6">
+						<SlidontLogo height={72} variant="dark" />
+						<h1 className="text-7xl font-bold text-white">
+							{event.title}
+						</h1>
+					</div>
+					<div className="flex items-center justify-center gap-8 text-3xl text-gray-400">
+						<span className="flex items-center gap-3">
+							<Clock className="h-8 w-8" />
+							{pendingQuestions.length} {t("pending")}
+						</span>
+					</div>
 				</div>
 
-				<div className="text-sm text-muted-foreground mb-4">
-					{questions?.filter((q) => !q.hiddenByPresenter).length || 0} pending questions
-				</div>
-
-				<div className="space-y-3">
-					{questions && questions.length === 0 ? (
-						<div className="text-center py-12 text-muted-foreground">
-							<p className="text-lg font-medium">No questions yet</p>
+				{/* Questions */}
+				<div className="space-y-12 max-w-7xl mx-auto">
+					{pendingQuestions.length === 0 ? (
+						<div className="text-center py-32">
+							<div className="flex justify-center mb-8 opacity-30">
+								<SlidontLogo height={96} variant="dark" />
+							</div>
+							<p className="text-7xl font-medium text-gray-600">{t("noQuestionsYet")}</p>
+							<p className="text-5xl text-gray-700 mt-8">{t("askAway")}</p>
 						</div>
 					) : (
-						questions?.map((question) => (
-							<Card key={question._id} className="p-4">
-								<div className="flex items-start gap-3">
-									<div className="flex-1 space-y-2">
-										<div className="flex items-center gap-2">
+						pendingQuestions.map((question) => (
+							<div
+								key={question._id}
+								className="relative bg-white border border-gray-200 rounded-2xl p-12 hover:border-gray-300 transition-all duration-200"
+							>
+								<div className="flex justify-between items-start gap-8">
+									<div className="flex-1 space-y-6">
+										{/* Author info */}
+										<div className="flex items-center gap-6">
 											<div
-												className="h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium text-white"
-												style={{ backgroundColor: question.authorColor }}
+												className="h-20 w-20 rounded-full flex items-center justify-center text-3xl font-bold text-white"
+												style={{
+													background: `linear-gradient(135deg, ${getGradientFromName(question.authorName).from}, ${getGradientFromName(question.authorName).to})`,
+												}}
 											>
-												{question.isAnonymous ? "?" : question.authorName.charAt(0).toUpperCase()}
+												{question.isAnonymous ? "?" : getInitials(question.authorName)}
 											</div>
-											<span className="text-sm font-medium">{question.authorName}</span>
-											<span className="text-xs text-muted-foreground">
-												{timeAgo(question.createdAt)}
-											</span>
-											{question.hiddenByFlags && (
-												<span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded">
-													Flagged
-												</span>
-											)}
-											{question.hiddenByPresenter && (
-												<span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded flex items-center gap-1">
-													<CheckCircle className="h-3 w-3" />
-													Done
-												</span>
-											)}
+											<div>
+												<div className="text-4xl font-semibold text-black">
+													{question.authorName}
+												</div>
+												<div className="text-2xl text-gray-500">
+													{timeAgo(question.createdAt)}
+												</div>
+											</div>
 										</div>
-										<p className="text-sm">{question.content}</p>
-										<div className="flex items-center gap-4 text-xs text-muted-foreground">
-											<span>👍 {question.voteCount}</span>
-											<span>🚩 {question.flagCount}</span>
+
+										{/* Question content */}
+										<p className="text-5xl leading-relaxed text-black font-normal">
+											{question.content}
+										</p>
+
+										{/* Stats */}
+										<div className="flex items-center gap-8 text-3xl text-gray-600">
+											<span className="flex items-center gap-3">
+												<ThumbsUp className="h-8 w-8" />
+												{question.voteCount}
+											</span>
+											<span className="flex items-center gap-3">
+												<Flag className="h-8 w-8" />
+												{question.flagCount}
+											</span>
 										</div>
 									</div>
-									{!question.hiddenByPresenter && (
-										<Button
-											variant="default"
-											size="sm"
-											onClick={() => handleMarkDone(question._id)}
-											className="gap-1"
-										>
-											<CheckCircle className="h-4 w-4" />
-											Done
-										</Button>
-									)}
+
+									{/* Mark Done Button */}
+									<Button
+										onClick={() => handleMarkDone(question._id)}
+										className="h-24 px-12 text-3xl font-semibold bg-black hover:bg-gray-900 text-white rounded-xl transition-all gap-4 min-w-[200px]"
+									>
+										<CheckCircle className="h-10 w-10" />
+										{t("done")}
+									</Button>
 								</div>
-							</Card>
+							</div>
 						))
 					)}
 				</div>

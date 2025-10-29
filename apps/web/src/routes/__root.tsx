@@ -1,6 +1,7 @@
 import Header from "@/components/header";
 import Loader from "@/components/loader";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LanguageProvider } from "@/components/language-provider";
 import { Toaster } from "@/components/ui/sonner";
 import {
 	HeadContent,
@@ -38,22 +39,34 @@ function RootComponent() {
 	const isFetching = useRouterState({
 		select: (s) => s.isLoading,
 	});
+	
+	const location = useRouterState({
+		select: (s) => s.location,
+	});
+	
+	const isPresenterPage = location.pathname.startsWith("/presenter/");
 
 	return (
 		<>
 			<HeadContent />
-			<ThemeProvider
-				attribute="class"
-				defaultTheme="dark"
-				disableTransitionOnChange
-				storageKey="vite-ui-theme"
-			>
-				<div className="grid grid-rows-[auto_1fr] h-svh">
-					<Header />
-					{isFetching ? <Loader /> : <Outlet />}
-				</div>
-				<Toaster richColors />
-			</ThemeProvider>
+			<LanguageProvider>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="dark"
+					disableTransitionOnChange
+					storageKey="vite-ui-theme"
+				>
+					{isPresenterPage ? (
+						<>{isFetching ? <Loader /> : <Outlet />}</>
+					) : (
+						<div className="grid grid-rows-[auto_1fr] h-svh">
+							<Header />
+							{isFetching ? <Loader /> : <Outlet />}
+						</div>
+					)}
+					<Toaster richColors />
+				</ThemeProvider>
+			</LanguageProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 		</>
 	);

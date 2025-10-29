@@ -1,5 +1,7 @@
 import usePresence from "@convex-dev/presence/react";
 import { api } from "@slidont/backend/convex/_generated/api";
+import { Users } from "lucide-react";
+import { useLanguage } from "@/components/language-provider";
 
 interface PresenceBarProps {
 	eventSlug: string;
@@ -8,13 +10,14 @@ interface PresenceBarProps {
 
 export function PresenceBar({ eventSlug, userName }: PresenceBarProps) {
 	const presence = usePresence(api.presence, eventSlug, userName);
+	const { t } = useLanguage();
 
 	if (!presence || presence.length === 0) {
 		return null;
 	}
 
 	// The presence hook returns an array of strings (user names)
-	const getUserInitial = (name: string): string => {
+	const getUserInitial = (name: any): string => {
 		if (!name || typeof name !== "string") return "?";
 		return name.charAt(0).toUpperCase();
 	};
@@ -31,7 +34,10 @@ export function PresenceBar({ eventSlug, userName }: PresenceBarProps) {
 					</div>
 				))}
 			</div>
-			<span>{presence.length} present</span>
+			<span className="flex items-center gap-1">
+				<Users className="h-4 w-4" />
+				{presence.length} {presence.length === 1 ? t("person") : t("people")}
+			</span>
 		</div>
 	);
 }
