@@ -10,7 +10,7 @@ interface TabContextType {
 const TabContext = React.createContext<TabContextType | undefined>(undefined);
 
 export function TabProvider({ children }: { children: React.ReactNode }) {
-	const [activeTab, setActiveTab] = React.useState<TabType>("buzz");
+	const [activeTab, setActiveTab] = React.useState<TabType>("qa");
 
 	return (
 		<TabContext.Provider value={{ activeTab, setActiveTab }}>
