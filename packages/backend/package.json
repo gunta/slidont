@@ -13,6 +13,7 @@
     "typescript": "catalog:"
   },
   "dependencies": {
+    "@convex-dev/presence": "^0.2.1",
     "convex": "catalog:"
   }
 }

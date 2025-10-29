@@ -22,7 +22,9 @@
     "dev:server": "turbo -F @slidont/backend dev",
     "dev:setup": "turbo -F @slidont/backend dev:setup"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@convex-dev/presence": "^0.2.1"
+  },
   "devDependencies": {
     "turbo": "^2.5.8"
   },
