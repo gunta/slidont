@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "catalog:",
+    "framer-motion": "^12.23.24",
     "lucide-react": "^0.473.0",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.2",

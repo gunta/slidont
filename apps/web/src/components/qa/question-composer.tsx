@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import meetupNames from "@/lib/meetup-names.json";
 import { Send, User } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
+import { motion } from "framer-motion";
 
 interface QuestionComposerProps {
 	eventSlug: string;
@@ -65,39 +66,64 @@ export function QuestionComposer({
 	};
 
 	return (
-		<Card className="p-4">
-			<div className="flex items-center gap-2 mb-4">
-				<h3 className="font-semibold">{t("askAQuestion")}</h3>
-			</div>
-			<form onSubmit={handleSubmit} className="space-y-4">
-				<Textarea
-					placeholder={t("yourQuestion")}
-					value={content}
-					onChange={(e) => setContent(e.target.value)}
-					rows={3}
-					className="resize-none"
-				/>
-				<div className="flex items-center gap-4">
-					<div className="flex-1 relative">
-						<User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-						<AutocompleteInput
-							placeholder={t("askingAs")}
-							value={name}
-							options={meetupNames}
-							onValueChange={(value) => {
-								setName(value);
-								onNameChange(value);
-							}}
-							className="pl-9"
-						/>
-					</div>
-					<Button type="submit" disabled={!content.trim() || !name.trim()} className="gap-2">
-						<Send className="h-4 w-4" />
-						{t("submit")}
-					</Button>
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.3 }}
+		>
+			<Card className="p-4 hover:shadow-lg transition-shadow">
+				<div className="flex items-center gap-2 mb-4">
+					<motion.h3
+						className="font-semibold"
+						animate={{ x: [0, 2, 0] }}
+						transition={{ duration: 2, repeat: Infinity, repeatDelay: 2 }}
+					>
+						{t("askAQuestion")}
+					</motion.h3>
 				</div>
-			</form>
-		</Card>
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<Textarea
+						placeholder={t("yourQuestion")}
+						value={content}
+						onChange={(e) => setContent(e.target.value)}
+						rows={3}
+						className="resize-none"
+					/>
+					<div className="flex items-center gap-4">
+						<div className="flex-1 relative">
+							<motion.div
+								className="absolute left-3 top-1/2 -translate-y-1/2"
+								animate={{ rotate: [0, 10, -10, 0] }}
+								transition={{ duration: 2, repeat: Infinity }}
+							>
+								<User className="h-4 w-4 text-muted-foreground pointer-events-none" />
+							</motion.div>
+							<AutocompleteInput
+								placeholder={t("askingAs")}
+								value={name}
+								options={meetupNames}
+								onValueChange={(value) => {
+									setName(value);
+									onNameChange(value);
+								}}
+								className="pl-9"
+							/>
+						</div>
+						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+							<Button type="submit" disabled={!content.trim() || !name.trim()} className="gap-2">
+								<motion.div
+									animate={{ x: [0, 2, 0] }}
+									transition={{ duration: 1, repeat: Infinity }}
+								>
+									<Send className="h-4 w-4" />
+								</motion.div>
+								{t("submit")}
+							</Button>
+						</motion.div>
+					</div>
+				</form>
+			</Card>
+		</motion.div>
 	);
 }
 

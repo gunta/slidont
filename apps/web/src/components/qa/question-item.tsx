@@ -8,6 +8,8 @@ import type { Id } from "@slidont/backend/convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getInitials } from "@/lib/identity";
 import { useLanguage } from "@/components/language-provider";
+import { SlidingNumber } from "@/components/ui/sliding-number";
+import { motion } from "framer-motion";
 
 const GRADIENT_PAIRS = [
 	{ from: "#ef4444", to: "#f97316" },
@@ -105,49 +107,61 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 	};
 
 	return (
-		<Card className="p-4">
-			<div className="flex items-start gap-3">
-				<div className="flex-1 space-y-2">
-					<div className="flex items-center gap-2">
-						<div
-							className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-white flex-shrink-0"
-							style={{
-								background: `linear-gradient(135deg, ${getGradientFromName(question.authorName).from}, ${getGradientFromName(question.authorName).to})`,
-							}}
-						>
-							{question.isAnonymous ? "?" : getInitials(question.authorName)}
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.3 }}
+		>
+			<Card className="p-4 hover:shadow-lg transition-shadow">
+				<div className="flex items-start gap-3">
+					<div className="flex-1 space-y-2">
+						<div className="flex items-center gap-2">
+							<motion.div
+								className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-white flex-shrink-0"
+								style={{
+									background: `linear-gradient(135deg, ${getGradientFromName(question.authorName).from}, ${getGradientFromName(question.authorName).to})`,
+								}}
+								whileHover={{ scale: 1.1 }}
+								transition={{ type: "spring", stiffness: 400 }}
+							>
+								{question.isAnonymous ? "?" : getInitials(question.authorName)}
+							</motion.div>
+							<span className="text-sm font-medium flex items-center gap-1">
+								<User className="h-3 w-3" />
+								{question.authorName}
+							</span>
+							<span className="text-xs text-muted-foreground flex items-center gap-1">
+								<Clock className="h-3 w-3" />
+								{timeAgo(question.createdAt)}
+							</span>
 						</div>
-						<span className="text-sm font-medium flex items-center gap-1">
-							<User className="h-3 w-3" />
-							{question.authorName}
-						</span>
-						<span className="text-xs text-muted-foreground flex items-center gap-1">
-							<Clock className="h-3 w-3" />
-							{timeAgo(question.createdAt)}
-						</span>
+						<p className="text-sm">{question.content}</p>
 					</div>
-					<p className="text-sm">{question.content}</p>
+					<div className="flex items-center gap-2">
+						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+							<Button
+								variant={localVoted ? "default" : "outline"}
+								size="sm"
+								onClick={handleVote}
+								className="gap-1"
+							>
+								<ThumbsUp className="h-4 w-4" />
+								<SlidingNumber value={localVoteCount} />
+							</Button>
+						</motion.div>
+						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+							<Button
+								variant={localFlagged ? "destructive" : "outline"}
+								size="sm"
+								onClick={handleFlag}
+							>
+								<Flag className="h-4 w-4" />
+							</Button>
+						</motion.div>
+					</div>
 				</div>
-				<div className="flex items-center gap-2">
-					<Button
-						variant={localVoted ? "default" : "outline"}
-						size="sm"
-						onClick={handleVote}
-						className="gap-1"
-					>
-						<ThumbsUp className="h-4 w-4" />
-						{localVoteCount}
-					</Button>
-					<Button
-						variant={localFlagged ? "destructive" : "outline"}
-						size="sm"
-						onClick={handleFlag}
-					>
-						<Flag className="h-4 w-4" />
-					</Button>
-				</div>
-			</div>
-		</Card>
+			</Card>
+		</motion.div>
 	);
 }
 

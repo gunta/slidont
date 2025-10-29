@@ -7,6 +7,7 @@ import type { Id } from "@slidont/backend/convex/_generated/dataModel";
 import { Clock, TrendingUp, Loader2 } from "lucide-react";
 import { SlidontLogo } from "@/components/slidont-logo";
 import { useLanguage } from "@/components/language-provider";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QuestionListProps {
 	eventSlug: string;
@@ -64,37 +65,72 @@ export function QuestionList({ eventSlug, sessionId }: QuestionListProps) {
 
 	return (
 		<div className="space-y-4">
-			<Tabs value={sortBy} onValueChange={(v) => setSortBy(v as "new" | "top")}>
-				<TabsList className="grid w-full grid-cols-2">
-					<TabsTrigger value="new" className="gap-2">
-						<Clock className="h-4 w-4" />
-						{t("realtime")}
-					</TabsTrigger>
-					<TabsTrigger value="top" className="gap-2">
-						<TrendingUp className="h-4 w-4" />
-						{t("top")}
-					</TabsTrigger>
-				</TabsList>
-			</Tabs>
+			<motion.div
+				initial={{ opacity: 0, y: -10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3 }}
+			>
+				<Tabs value={sortBy} onValueChange={(v) => setSortBy(v as "new" | "top")}>
+					<TabsList className="grid w-full grid-cols-2">
+						<TabsTrigger value="new" className="gap-2">
+							<motion.div
+								animate={{ rotate: [0, 360] }}
+								transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+							>
+								<Clock className="h-4 w-4" />
+							</motion.div>
+							{t("realtime")}
+						</TabsTrigger>
+						<TabsTrigger value="top" className="gap-2">
+							<motion.div
+								animate={{ y: [0, -3, 0] }}
+								transition={{ duration: 1.5, repeat: Infinity }}
+							>
+								<TrendingUp className="h-4 w-4" />
+							</motion.div>
+							{t("top")}
+						</TabsTrigger>
+					</TabsList>
+				</Tabs>
+			</motion.div>
 
 			<div className="space-y-3">
 				{sortedQuestions.length === 0 ? (
-					<div className="text-center py-12 text-muted-foreground">
+					<motion.div
+						className="text-center py-12 text-muted-foreground"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ duration: 0.5 }}
+					>
 						<div className="flex justify-center mb-4 opacity-30">
-							<SlidontLogo height={48} />
+							<motion.div
+								animate={{ rotate: [0, 5, -5, 0] }}
+								transition={{ duration: 2, repeat: Infinity }}
+							>
+								<SlidontLogo height={48} />
+							</motion.div>
 						</div>
 						<p className="text-lg font-medium">{t("noQuestionsYet")}</p>
-					</div>
+					</motion.div>
 				) : (
-					sortedQuestions.map((question) => (
-						<QuestionItem
-							key={question._id}
-							question={question}
-							sessionId={sessionId}
-							hasVoted={false}
-							hasFlagged={false}
-						/>
-					))
+					<AnimatePresence mode="popLayout">
+						{sortedQuestions.map((question, index) => (
+							<motion.div
+								key={question._id}
+								initial={{ opacity: 0, x: -20 }}
+								animate={{ opacity: 1, x: 0 }}
+								exit={{ opacity: 0, x: 20 }}
+								transition={{ duration: 0.3, delay: index * 0.05 }}
+							>
+								<QuestionItem
+									question={question}
+									sessionId={sessionId}
+									hasVoted={false}
+									hasFlagged={false}
+								/>
+							</motion.div>
+						))}
+					</AnimatePresence>
 				)}
 			</div>
 		</div>
