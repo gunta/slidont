@@ -4,7 +4,7 @@ import { api } from "@slidont/backend/convex/_generated/api";
 import { useLocalIdentity } from "@/lib/identity";
 import { QuestionComposer } from "@/components/qa/question-composer";
 import { QuestionList } from "@/components/qa/question-list";
-import { PresenceBar } from "@/components/qa/presence-bar";
+// import { PresenceBar } from "@/components/qa/presence-bar";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/q/$eventSlug")({
@@ -21,7 +21,18 @@ function QAPage() {
 		ensureSeed();
 	}, [ensureSeed]);
 
-	if (!event) {
+	if (event === undefined) {
+		return (
+			<div className="container mx-auto max-w-3xl px-4 py-8">
+				<div className="text-center">
+					<h1 className="text-2xl font-bold mb-4">Loading...</h1>
+					<p className="text-muted-foreground">Setting up your Q&A session...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (event === null) {
 		return (
 			<div className="container mx-auto max-w-3xl px-4 py-8">
 				<div className="text-center">
@@ -40,7 +51,7 @@ function QAPage() {
 					<p className="text-muted-foreground">Ask your questions below</p>
 				</div>
 
-				<PresenceBar eventSlug={eventSlug} userName={displayName || "Anonymous"} />
+				{/* <PresenceBar eventSlug={eventSlug} userName={displayName || "Anonymous"} /> */}
 
 				<QuestionComposer
 					eventSlug={eventSlug}

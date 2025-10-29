@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@slidont/backend/convex/_generated/api";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,18 +23,34 @@ interface Question {
 
 export function QuestionList({ eventSlug, sessionId }: QuestionListProps) {
 	const [sortBy, setSortBy] = useState<"new" | "top">("new");
-	const questions = useQuery(api.questions.list, { eventSlug, sortBy });
+	const allQuestions = useQuery(api.questions.list, { eventSlug, sortBy: "new" });
 	const listRef = useRef<HTMLDivElement>(null);
 	const wasNewModeRef = useRef(sortBy === "new");
 
+	// Sort questions in memory based on selected tab
+	const sortedQuestions = useMemo(() => {
+		if (!allQuestions) return null;
+
+		if (sortBy === "new") {
+			return [...allQuestions].sort((a, b) => b.createdAt - a.createdAt);
+		} else {
+			return [...allQuestions].sort((a, b) => {
+				if (b.voteCount !== a.voteCount) {
+					return b.voteCount - a.voteCount;
+				}
+				return b.createdAt - a.createdAt;
+			});
+		}
+	}, [allQuestions, sortBy]);
+
 	useEffect(() => {
-		if (sortBy === "new" && wasNewModeRef.current && questions && questions.length > 0) {
+		if (sortBy === "new" && wasNewModeRef.current && sortedQuestions && sortedQuestions.length > 0) {
 			listRef.current?.scrollTo({ top: 0, behavior: "smooth" });
 		}
 		wasNewModeRef.current = sortBy === "new";
-	}, [questions, sortBy]);
+	}, [sortedQuestions, sortBy]);
 
-	if (!questions) {
+	if (!sortedQuestions) {
 		return <div className="text-center py-8 text-muted-foreground">Loading...</div>;
 	}
 
@@ -48,13 +64,13 @@ export function QuestionList({ eventSlug, sessionId }: QuestionListProps) {
 			</Tabs>
 
 			<div ref={listRef} className="space-y-3 max-h-[600px] overflow-y-auto">
-				{questions.length === 0 ? (
+				{sortedQuestions.length === 0 ? (
 					<div className="text-center py-12 text-muted-foreground">
 						<p className="text-lg font-medium">No questions yet</p>
 						<p className="text-sm">Be the first to ask!</p>
 					</div>
 				) : (
-					questions.map((question) => (
+					sortedQuestions.map((question) => (
 						<QuestionItem
 							key={question._id}
 							question={question}
