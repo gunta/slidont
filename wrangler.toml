@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration for Slidont
+# This file is optional but helpful for local development and CLI deployments
+
+name = "slidont"
+compatibility_date = "2024-01-01"
+
+# Pages configuration
+pages_build_output_dir = "apps/web/dist"
+
+# Note: Environment variables should be set in the Cloudflare Dashboard
+# VITE_CONVEX_URL should be configured in Pages settings
+

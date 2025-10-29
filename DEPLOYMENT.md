@@ -1,10 +1,10 @@
 # Deployment Guide for Slidont
 
-This guide will help you deploy Slidont to Vercel (frontend) and Convex (backend).
+This guide will help you deploy Slidont to Cloudflare Pages or Vercel (frontend) and Convex (backend).
 
 ## Prerequisites
 
-- A Vercel account (sign up at [vercel.com](https://vercel.com))
+- A Cloudflare account (sign up at [cloudflare.com](https://cloudflare.com)) OR a Vercel account (sign up at [vercel.com](https://vercel.com))
 - A Convex account (sign up at [convex.dev](https://convex.dev))
 - Your project pushed to GitHub
 
@@ -28,7 +28,7 @@ This guide will help you deploy Slidont to Vercel (frontend) and Convex (backend
      ```
      Deployment URL: https://your-project.convex.cloud
      ```
-   - Copy this URL - you'll need it for Vercel
+   - Copy this URL - you'll need it for Cloudflare Pages or Vercel
 
 ### Production Deployment
 
@@ -39,7 +39,82 @@ cd packages/backend
 convex deploy --prod
 ```
 
-## Step 2: Deploy Frontend to Vercel
+## Step 2: Deploy Frontend to Cloudflare Pages or Vercel
+
+Choose your preferred platform:
+
+- [Cloudflare Pages](#cloudflare-pages) - Fast, global CDN with excellent performance
+- [Vercel](#vercel) - Developer-friendly with great DX
+
+---
+
+### Cloudflare Pages
+
+#### Option A: Deploy via Cloudflare Dashboard (Recommended)
+
+1. **Go to [Cloudflare Dashboard](https://dash.cloudflare.com) and sign in**
+
+2. **Import your GitHub repository:**
+   - Navigate to **Workers & Pages** → **Create application**
+   - Select **Pages** tab
+   - Choose **Import an existing Git repository**
+   - Select your GitHub repository
+   - Click **Begin setup**
+
+3. **Configure build settings:**
+   - **Production branch:** `main`
+   - **Framework preset:** (leave empty or select "None")
+   - **Build command:** `cd apps/web && bun run build`
+   - **Build output directory:** `apps/web/dist`
+   - **Root directory:** (leave blank - deploy from repo root)
+   - **Environment variables:** Add `VITE_CONVEX_URL` with your Convex deployment URL
+
+4. **Set Environment Variables:**
+   - Before deploying, add environment variables:
+     - **Name:** `VITE_CONVEX_URL`
+     - **Value:** Your Convex deployment URL (from Step 1)
+   - Make sure to add it for Production, Preview, and Branch deployments
+
+5. **Deploy:**
+   - Click **Save and Deploy**
+   - Wait for the build to complete
+   - Your site will be live at `https://your-project.pages.dev`
+
+#### Option B: Deploy via Wrangler CLI
+
+1. **Install Wrangler CLI:**
+   ```bash
+   bun install -g wrangler
+   ```
+
+2. **Login to Cloudflare:**
+   ```bash
+   wrangler login
+   ```
+
+3. **Build and deploy:**
+   ```bash
+   cd apps/web
+   bun run build
+   wrangler pages deploy dist --project-name=slidont
+   ```
+
+#### Option C: Manual Upload
+
+1. **Build locally:**
+   ```bash
+   cd apps/web
+   bun run build
+   ```
+
+2. **Upload via Dashboard:**
+   - Go to Cloudflare Dashboard → **Workers & Pages** → Your project
+   - Click **Upload assets**
+   - Upload the contents of `apps/web/dist` folder
+
+---
+
+### Vercel
 
 ### Option A: Deploy via Vercel Dashboard (Recommended)
 
@@ -97,8 +172,8 @@ convex deploy --prod
 
 ## Step 3: Verify Deployment
 
-1. **Check your Vercel deployment:**
-   - Visit your Vercel URL
+1. **Check your deployment:**
+   - Visit your Cloudflare Pages URL (`*.pages.dev`) or Vercel URL (`*.vercel.app`)
    - Verify the health check shows "Connected" (green status)
 
 2. **Test features:**
@@ -108,9 +183,9 @@ convex deploy --prod
 
 ## Updating Your Deployment
 
-### Updating Frontend (Vercel)
+### Updating Frontend (Cloudflare Pages or Vercel)
 - Push changes to your GitHub main branch
-- Vercel will automatically deploy
+- Cloudflare Pages or Vercel will automatically deploy
 
 ### Updating Backend (Convex)
 - Push changes to your GitHub main branch
@@ -125,9 +200,16 @@ convex deploy --prod
 ## Troubleshooting
 
 ### Frontend shows "Error" connection status
-- Check that `VITE_CONVEX_URL` is set correctly in Vercel
+- Check that `VITE_CONVEX_URL` is set correctly in Cloudflare Pages or Vercel
 - Verify your Convex deployment is running
-- Check Vercel build logs for errors
+- Check build logs for errors
+
+### Build fails on Cloudflare Pages
+- Make sure you're using Bun (Cloudflare Pages supports Bun)
+- Check that all dependencies are in `package.json`
+- Review build logs in Cloudflare dashboard
+- Ensure workspace dependencies are properly resolved
+- Try running `bun install` locally to verify
 
 ### Build fails on Vercel
 - Make sure you're using Node.js 18+ or Bun
@@ -144,27 +226,39 @@ convex deploy --prod
 ```
 slidont/
 ├── apps/
-│   └── web/              # Frontend (deployed to Vercel)
+│   └── web/              # Frontend (deployed to Cloudflare Pages or Vercel)
 │       ├── src/
-│       ├── dist/         # Build output (Vercel serves this)
+│       ├── dist/         # Build output (served by hosting platform)
 │       └── package.json
 ├── packages/
 │   └── backend/          # Backend (deployed to Convex)
 │       └── convex/       # Convex functions
-├── vercel.json           # Vercel configuration
+├── vercel.json           # Vercel configuration (if using Vercel)
 └── package.json          # Root package.json
 ```
 
 ## Environment Variables
 
-### Required for Frontend (Vercel)
+### Required for Frontend (Cloudflare Pages or Vercel)
 - `VITE_CONVEX_URL` - Your Convex deployment URL
 
 ### Set automatically by Convex
 - Convex handles backend environment variables automatically
 
+## Platform Comparison
+
+| Feature | Cloudflare Pages | Vercel |
+|---------|------------------|--------|
+| Global CDN | ✅ Built-in | ✅ Built-in |
+| Build speed | ⚡ Fast | ⚡ Fast |
+| Monorepo support | ✅ Yes | ✅ Yes |
+| Bun support | ✅ Yes | ✅ Yes |
+| Free tier | ✅ Generous | ✅ Generous |
+| Pricing | 💰 Pay-as-you-go | 💰 Pay-as-you-go |
+
 ## Additional Resources
 
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
 - [Vercel Documentation](https://vercel.com/docs)
 - [Convex Documentation](https://docs.convex.dev)
 - [Vite Deployment Guide](https://vitejs.dev/guide/static-deploy.html)
