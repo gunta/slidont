@@ -64,6 +64,7 @@ Choose your preferred platform:
 3. **Configure build settings:**
    - **Production branch:** `main`
    - **Framework preset:** (leave empty or select "None")
+   - **Install command:** `bun install`
    - **Build command:** `cd apps/web && bun run build`
    - **Build output directory:** `apps/web/dist`
    - **Root directory:** (leave blank - deploy from repo root)
