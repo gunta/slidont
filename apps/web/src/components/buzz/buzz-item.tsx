@@ -38,9 +38,9 @@ function getGradientFromName(name: string): { from: string; to: string } {
 	return GRADIENT_PAIRS[Math.abs(hash) % GRADIENT_PAIRS.length];
 }
 
-interface QuestionItemProps {
-	question: {
-		_id: Id<"questions">;
+interface BuzzItemProps {
+	buzz: {
+		_id: Id<"buzz">;
 		content: string;
 		authorName: string;
 		isAnonymous: boolean;
@@ -54,33 +54,30 @@ interface QuestionItemProps {
 	hasFlagged: boolean;
 }
 
-export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: QuestionItemProps) {
+export function BuzzItem({ buzz, sessionId, hasVoted, hasFlagged }: BuzzItemProps) {
 	const [localVoted, setLocalVoted] = useState(hasVoted);
-	const [localVoteCount, setLocalVoteCount] = useState(question.voteCount);
+	const [localVoteCount, setLocalVoteCount] = useState(buzz.voteCount);
 	const [localFlagged, setLocalFlagged] = useState(hasFlagged);
 	const [isVoting, setIsVoting] = useState(false);
 	const [isFlagging, setIsFlagging] = useState(false);
 	const isVotingRef = useRef(false);
 	const isFlaggingRef = useRef(false);
-	const toggleVote = useMutation(api.votes.toggle);
-	const toggleFlag = useMutation(api.flags.toggle);
+	const shouldAnimateRef = useRef(true);
+	const toggleVote = useMutation(api.buzzVotes.toggle);
+	const toggleFlag = useMutation(api.buzzFlags.toggle);
 	const { t, language } = useLanguage();
 
-	// Only sync from props when not in an optimistic state and props actually changed
 	useEffect(() => {
-		if (!isVotingRef.current && !isVoting && hasVoted !== localVoted) {
-			setLocalVoted(hasVoted);
-			setLocalVoteCount(question.voteCount);
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [hasVoted, question.voteCount, isVoting]);
+		shouldAnimateRef.current = false;
+	}, []);
 
+	// Sync vote count from server (hasVoted props are hardcoded to false, so ignore them)
 	useEffect(() => {
-		if (!isFlaggingRef.current && !isFlagging && hasFlagged !== localFlagged) {
-			setLocalFlagged(hasFlagged);
+		if (!isVotingRef.current && !isVoting) {
+			setLocalVoteCount(buzz.voteCount);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [hasFlagged, isFlagging]);
+	}, [buzz.voteCount, isVoting]);
 
 	const handleVote = async () => {
 		if (isVotingRef.current) return; // Prevent double-clicks
@@ -94,7 +91,7 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 		setLocalVoteCount(optimisticCount);
 
 		try {
-			await toggleVote({ questionId: question._id, sessionId });
+			await toggleVote({ buzzId: buzz._id, sessionId });
 			// Small delay to ensure server state has propagated
 			setTimeout(() => {
 				isVotingRef.current = false;
@@ -102,7 +99,7 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 			}, 100);
 		} catch (error) {
 			setLocalVoted(!optimisticVoted);
-			setLocalVoteCount(question.voteCount);
+			setLocalVoteCount(buzz.voteCount);
 			isVotingRef.current = false;
 			setIsVoting(false);
 			toast.error(t("failedToVote"));
@@ -118,7 +115,7 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 		setLocalFlagged(optimisticFlagged);
 
 		try {
-			await toggleFlag({ questionId: question._id, sessionId });
+			await toggleFlag({ buzzId: buzz._id, sessionId });
 			// Small delay to ensure server state has propagated
 			setTimeout(() => {
 				isFlaggingRef.current = false;
@@ -145,7 +142,7 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 20 }}
+			initial={shouldAnimateRef.current ? { opacity: 0, y: 20 } : false}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3 }}
 		>
@@ -156,23 +153,23 @@ export function QuestionItem({ question, sessionId, hasVoted, hasFlagged }: Ques
 							<motion.div
 								className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-medium text-white flex-shrink-0"
 								style={{
-									background: `linear-gradient(135deg, ${getGradientFromName(question.authorName).from}, ${getGradientFromName(question.authorName).to})`,
+									background: `linear-gradient(135deg, ${getGradientFromName(buzz.authorName).from}, ${getGradientFromName(buzz.authorName).to})`,
 								}}
 								whileHover={{ scale: 1.1 }}
 								transition={{ type: "spring", stiffness: 400 }}
 							>
-								{question.isAnonymous ? "?" : getInitials(question.authorName)}
+								{buzz.isAnonymous ? "?" : getInitials(buzz.authorName)}
 							</motion.div>
 							<span className="text-sm font-medium flex items-center gap-1">
 								<User className="h-3 w-3" />
-								{question.authorName}
+								{buzz.authorName}
 							</span>
 							<span className="text-xs text-muted-foreground flex items-center gap-1">
 								<Clock className="h-3 w-3" />
-								{timeAgo(question.createdAt)}
+								{timeAgo(buzz.createdAt)}
 							</span>
 						</div>
-						<p className="text-sm">{question.content}</p>
+						<p className="text-sm">{buzz.content}</p>
 					</div>
 					<div className="flex items-center gap-2">
 						<motion.div whileHover={{ scale: isVoting ? 1 : 1.05 }} whileTap={{ scale: isVoting ? 1 : 0.95 }}>

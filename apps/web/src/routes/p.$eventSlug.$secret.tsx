@@ -37,7 +37,7 @@ function getGradientFromName(name: string): { from: string; to: string } {
 	return GRADIENT_PAIRS[Math.abs(hash) % GRADIENT_PAIRS.length];
 }
 
-export const Route = createFileRoute("/presenter/$eventSlug/$secret")({
+export const Route = createFileRoute("/p/$eventSlug/$secret")({
 	component: PresenterPage,
 });
 
@@ -206,10 +206,23 @@ function PresenterPage() {
 							{pendingQuestions.map((question, index) => (
 								<motion.div
 									key={question._id}
+									layout
 									initial={{ opacity: 0, y: 50, scale: 0.9 }}
 									animate={{ opacity: 1, y: 0, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.8, y: -20 }}
+									exit={{ 
+										opacity: 0, 
+										scale: 0.8, 
+										y: -30,
+										transition: {
+											duration: 0.4,
+											ease: [0.4, 0, 0.2, 1]
+										}
+									}}
 									transition={{ 
+										layout: {
+											duration: 0.5,
+											ease: [0.4, 0, 0.2, 1]
+										},
 										duration: 0.5,
 										delay: index * 0.1,
 										type: "spring",
@@ -294,3 +307,4 @@ function PresenterPage() {
 		</div>
 	);
 }
+

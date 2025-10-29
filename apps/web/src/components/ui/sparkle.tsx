@@ -8,7 +8,7 @@ interface SparkleProps {
 
 export function Sparkle({ size = 20, className }: SparkleProps) {
 	return (
-		<motion.div
+		<motion.span
 			className={className}
 			animate={{
 				rotate: [0, 180, 360],
@@ -21,7 +21,7 @@ export function Sparkle({ size = 20, className }: SparkleProps) {
 			}}
 		>
 			<Sparkles size={size} className="text-yellow-400" />
-		</motion.div>
+		</motion.span>
 	);
 }
 

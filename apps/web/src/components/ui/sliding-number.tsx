@@ -1,5 +1,5 @@
 import { motion, useSpring, useTransform } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface SlidingNumberProps {
 	value: number;
@@ -8,19 +8,24 @@ interface SlidingNumberProps {
 
 export function SlidingNumber({ value, className }: SlidingNumberProps) {
 	const spring = useSpring(0, {
-		stiffness: 100,
-		damping: 20,
+		stiffness: 300,
+		damping: 30,
 	});
 	const display = useTransform(spring, (current) =>
 		Math.round(current).toLocaleString()
 	);
+	const prevValueRef = useRef(value);
 
 	useEffect(() => {
-		spring.set(value);
+		// Only animate if the value has actually changed
+		if (prevValueRef.current !== value) {
+			spring.set(value);
+			prevValueRef.current = value;
+		}
 	}, [spring, value]);
 
 	return (
-		<motion.span className={className} initial={{ scale: 0.5 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
+		<motion.span className={className}>
 			{display}
 		</motion.span>
 	);

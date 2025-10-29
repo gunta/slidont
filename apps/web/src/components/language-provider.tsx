@@ -26,7 +26,13 @@ const translations: Record<Language, Record<string, string>> = {
 		"error": "Error",
 		"cursorTokyoMeetup": "Cursor Tokyo Meetup",
 		"joinDescription": "Join the live Q&A session - Ask your questions, vote for your favorites, and engage with the community in real-time.",
-		"joinQASession": "Join Q&A Session",
+		"joinQASession": "Join Session",
+		"enterYourName": "Enter Your Name",
+		"enterNameToJoin": "Please enter your name to join the Q&A session",
+		"enterYourNamePlaceholder": "Enter your name",
+		"continue": "Continue",
+		"currentName": "Current name",
+		"nameSaved": "Name saved successfully!",
 		
 		// QA page
 		"askAQuestion": "Ask a question",
@@ -52,6 +58,16 @@ const translations: Record<Language, Record<string, string>> = {
 		"failedToPost": "Failed to post question",
 		"failedToVote": "Failed to vote",
 		"failedToFlag": "Failed to flag",
+		
+		// Buzz
+		"buzz": "Buzz",
+		"buzzJapanese": "上げ上げ",
+		"yourComment": "Your comment",
+		"pleaseEnterComment": "Please enter a comment",
+		"commentPosted": "Comment posted!",
+		"failedToPostComment": "Failed to post comment",
+		"noCommentsYet": "No comments yet. Be the first to comment!",
+		"autoscroll": "Autoscroll",
 		
 		// Presenter page
 		"presenterMode": "Presenter Mode",
@@ -87,6 +103,12 @@ const translations: Record<Language, Record<string, string>> = {
 		"cursorTokyoMeetup": "Cursor Tokyo Meetup",
 		"joinDescription": "ライブQ&Aセッションに参加 - 質問を投稿し、お気に入りに投票し、リアルタイムでコミュニティと交流しましょう。",
 		"joinQASession": "Q&Aセッションに参加",
+		"enterYourName": "お名前を入力",
+		"enterNameToJoin": "Q&Aセッションに参加するには、お名前を入力してください",
+		"enterYourNamePlaceholder": "お名前を入力",
+		"continue": "続ける",
+		"currentName": "現在の名前",
+		"nameSaved": "名前を保存しました！",
 		
 		// QA page
 		"askAQuestion": "質問する",
@@ -112,6 +134,16 @@ const translations: Record<Language, Record<string, string>> = {
 		"failedToPost": "質問の投稿に失敗しました",
 		"failedToVote": "投票に失敗しました",
 		"failedToFlag": "フラグに失敗しました",
+		
+		// Buzz
+		"buzz": "Buzz",
+		"buzzJapanese": "上げ上げ",
+		"yourComment": "つぶやき",
+		"pleaseEnterComment": "つぶやきを入力してください",
+		"commentPosted": "つぶやきを投稿しました！",
+		"failedToPostComment": "つぶやきの投稿に失敗しました",
+		"noCommentsYet": "まだつぶやきがありません。最初のつぶやきを投稿しましょう！",
+		"autoscroll": "自動スクロール",
 		
 		// Presenter page
 		"presenterMode": "プレゼンターモード",

@@ -8,6 +8,9 @@
  * @module
  */
 
+import type * as buzz from "../buzz.js";
+import type * as buzzFlags from "../buzzFlags.js";
+import type * as buzzVotes from "../buzzVotes.js";
 import type * as events from "../events.js";
 import type * as flags from "../flags.js";
 import type * as healthCheck from "../healthCheck.js";
@@ -31,6 +34,9 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  buzz: typeof buzz;
+  buzzFlags: typeof buzzFlags;
+  buzzVotes: typeof buzzVotes;
   events: typeof events;
   flags: typeof flags;
   healthCheck: typeof healthCheck;

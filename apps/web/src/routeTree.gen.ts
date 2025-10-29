@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as QEventSlugRouteImport } from './routes/q.$eventSlug'
-import { Route as PresenterEventSlugSecretRouteImport } from './routes/presenter.$eventSlug.$secret'
+import { Route as PEventSlugSecretRouteImport } from './routes/p.$eventSlug.$secret'
 
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
@@ -29,50 +29,44 @@ const QEventSlugRoute = QEventSlugRouteImport.update({
   path: '/q/$eventSlug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PresenterEventSlugSecretRoute =
-  PresenterEventSlugSecretRouteImport.update({
-    id: '/presenter/$eventSlug/$secret',
-    path: '/presenter/$eventSlug/$secret',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const PEventSlugSecretRoute = PEventSlugSecretRouteImport.update({
+  id: '/p/$eventSlug/$secret',
+  path: '/p/$eventSlug/$secret',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/todos': typeof TodosRoute
   '/q/$eventSlug': typeof QEventSlugRoute
-  '/presenter/$eventSlug/$secret': typeof PresenterEventSlugSecretRoute
+  '/p/$eventSlug/$secret': typeof PEventSlugSecretRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/todos': typeof TodosRoute
   '/q/$eventSlug': typeof QEventSlugRoute
-  '/presenter/$eventSlug/$secret': typeof PresenterEventSlugSecretRoute
+  '/p/$eventSlug/$secret': typeof PEventSlugSecretRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/todos': typeof TodosRoute
   '/q/$eventSlug': typeof QEventSlugRoute
-  '/presenter/$eventSlug/$secret': typeof PresenterEventSlugSecretRoute
+  '/p/$eventSlug/$secret': typeof PEventSlugSecretRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/todos' | '/q/$eventSlug' | '/presenter/$eventSlug/$secret'
+  fullPaths: '/' | '/todos' | '/q/$eventSlug' | '/p/$eventSlug/$secret'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/todos' | '/q/$eventSlug' | '/presenter/$eventSlug/$secret'
-  id:
-    | '__root__'
-    | '/'
-    | '/todos'
-    | '/q/$eventSlug'
-    | '/presenter/$eventSlug/$secret'
+  to: '/' | '/todos' | '/q/$eventSlug' | '/p/$eventSlug/$secret'
+  id: '__root__' | '/' | '/todos' | '/q/$eventSlug' | '/p/$eventSlug/$secret'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   TodosRoute: typeof TodosRoute
   QEventSlugRoute: typeof QEventSlugRoute
-  PresenterEventSlugSecretRoute: typeof PresenterEventSlugSecretRoute
+  PEventSlugSecretRoute: typeof PEventSlugSecretRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -98,11 +92,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QEventSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/presenter/$eventSlug/$secret': {
-      id: '/presenter/$eventSlug/$secret'
-      path: '/presenter/$eventSlug/$secret'
-      fullPath: '/presenter/$eventSlug/$secret'
-      preLoaderRoute: typeof PresenterEventSlugSecretRouteImport
+    '/p/$eventSlug/$secret': {
+      id: '/p/$eventSlug/$secret'
+      path: '/p/$eventSlug/$secret'
+      fullPath: '/p/$eventSlug/$secret'
+      preLoaderRoute: typeof PEventSlugSecretRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -112,7 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   TodosRoute: TodosRoute,
   QEventSlugRoute: QEventSlugRoute,
-  PresenterEventSlugSecretRoute: PresenterEventSlugSecretRoute,
+  PEventSlugSecretRoute: PEventSlugSecretRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
