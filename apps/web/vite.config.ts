@@ -9,6 +9,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
+			"@slidont/backend": path.resolve(__dirname, "../../packages/backend"),
 		},
 	},
 });

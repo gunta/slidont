@@ -12,7 +12,8 @@
 		"rootDirs": ["."],
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@slidont/backend/*": ["../../packages/backend/*"]
 		}
 	}
 }
